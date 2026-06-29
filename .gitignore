@@ -1,0 +1,19 @@
+precomputed/
+__pycache__/
+*.pyc
+*.csv
+!sample_submission.csv
+*.egg-info/
+.env
+.venv/
+venv/
+*.pkl
+*.faiss
+local_test_submission.csv
+test_format_check.csv
+candidates.jsonl
+context.txt
+dataset folder/
+*.pptx
+*.pdf
+make_deck.js

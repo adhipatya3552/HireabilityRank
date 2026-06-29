@@ -343,8 +343,8 @@ def rank_candidates(out_path: str):
             },
         })
 
-    # Sort descending
-    results.sort(key=lambda x: x["score"], reverse=True)
+    # Sort: score descending, then candidate_id ascending for tie-break (spec requirement)
+    results.sort(key=lambda x: (-x["score"], x["candidate_id"]))
     top = results[:TOP_N_SUBMIT]
 
     # Guarantee spec: non-increasing scores
@@ -374,6 +374,45 @@ def rank_candidates(out_path: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="HireabilityRank — submission ranker")
-    parser.add_argument("--out", default="submission.csv", help="Output CSV path (use your team ID as filename)")
+    parser.add_argument("--candidates", default="candidates.jsonl",
+                        help="Path to candidates.jsonl (used only for --test mode)")
+    parser.add_argument("--out", default="submission.csv",
+                        help="Output CSV path — use your registered team ID as the filename")
+    parser.add_argument("--test", action="store_true",
+                        help="Quick test mode: rank from a JSON file without precomputed index")
     args = parser.parse_args()
+
+    if args.test:
+        # Test mode: build temp index from small JSON file (e.g. sample_candidates.json)
+        import json, tempfile, pickle, os
+        print(f"[TEST MODE] Loading candidates from {args.candidates}")
+        with open(args.candidates) as f:
+            # Handle both .json (array) and .jsonl (line-delimited)
+            text = f.read().strip()
+            candidates = json.loads(text) if text.startswith("[") else [json.loads(l) for l in text.splitlines() if l.strip()]
+
+        print(f"[TEST MODE] Building temporary index for {len(candidates)} candidates...")
+        model = SentenceTransformer(MODEL_NAME)
+        texts = []
+        for c in candidates:
+            p = c.get("profile", {})
+            t = f"{p.get('headline','')} {p.get('summary','')[:300]} "
+            t += " ".join(s.get("name","") for s in c.get("skills",[]))
+            texts.append(t)
+
+        vecs = model.encode(texts, normalize_embeddings=True, convert_to_numpy=True).astype("float32")
+        import faiss as _faiss
+        idx = _faiss.IndexFlatIP(vecs.shape[1])
+        idx.add(vecs)
+
+        PRECOMPUTED.mkdir(exist_ok=True)
+        _faiss.write_index(idx, str(PRECOMPUTED / "candidates.faiss"))
+
+        from precompute import extract_metadata
+        meta_data = {"ids": [c["candidate_id"] for c in candidates],
+                     "metadata": [extract_metadata(c) for c in candidates]}
+        with open(PRECOMPUTED / "metadata.pkl", "wb") as f:
+            pickle.dump(meta_data, f, protocol=4)
+        print("[TEST MODE] Temp index ready. Running ranker...")
+
     rank_candidates(args.out)

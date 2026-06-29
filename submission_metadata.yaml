@@ -1,23 +1,35 @@
 # Redrob Hackathon — Submission Metadata
-# Fill in YOUR_TEAM_ID and your actual sandbox link before submitting.
+# Generated for HireabilityRank submission
 
+# ============================================================================
+# Team identity
+# ============================================================================
 team_name: "HireabilityRank"
 
 primary_contact:
   name: "Adhipatya Saxena"
-  email: ""          # fill in your email
-  phone: ""          # fill in your phone
+  email: "adhipatya.saxena@gmail.com"    # ← FILL IN before submitting
+  phone: "+91-8770607999"            # ← FILL IN before submitting
 
 team_members:
   - name: "Adhipatya Saxena"
-    email: ""
+    email: "adhipatya.saxena@gmail.com"  # ← FILL IN
     role: "ML Engineer / Solo"
 
-github_repo: "https://github.com/adhipatya3552/hireabilityrank"
+# ============================================================================
+# Code and reproducibility
+# ============================================================================
+github_repo: "https://github.com/adhipatya3552/HireabilityRank.git"
+# ↑ Create this repo and push the code before submitting
+
 sandbox_link: "https://huggingface.co/spaces/adhipatya3552/hireabilityrank"
+# ↑ Deploy app.py to HuggingFace Spaces (free CPU tier) before submitting
 
-reproduce_command: "python rank.py --out submission.csv"
+reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
 
+# ============================================================================
+# Compute environment
+# ============================================================================
 compute:
   platform: "Local Machine"
   cpu_cores: 8
@@ -27,33 +39,40 @@ compute:
   uses_gpu_for_inference: false
   has_network_during_ranking: false
   pre_computation_required: true
-  pre_computation_time_minutes: 25    # precompute.py (run once, outside 5-min window)
+  pre_computation_time_minutes: 25
 
+# ============================================================================
+# AI tools declaration
+# ============================================================================
 ai_tools_used:
   - "Claude"
 
 ai_usage_summary: |
   Used Claude for architecture discussion and code review.
-  All scoring logic, signal weighting, and trap detection written by the team.
-  No candidate data was fed to any hosted LLM during ranking.
+  All scoring logic, signal weighting, and trap-detection heuristics were
+  designed and tested by the team. No candidate data was fed to any hosted LLM.
 
+# ============================================================================
+# Approach summary
+# ============================================================================
 methodology_summary: |
-  HireabilityRank uses a two-stage pipeline:
-  Stage 1 (offline, precompute.py): Sentence-transformer embeddings (all-MiniLM-L6-v2)
-  computed for all 100K candidates, stored in a FAISS IndexFlatIP for fast cosine search.
-  Stage 2 (runtime <5 min, rank.py): JD is embedded, FAISS retrieves top 5000 candidates,
-  then a multi-factor scoring model reranks them:
-    - Semantic Match (28%): FAISS cosine similarity JD vs candidate text
-    - Skill Match (25%): JD-required skills with trust multiplier to penalise keyword stuffers
-    - Experience (12%): JD sweet spot 5-9 years
-    - Career Signal (12%): product-engineering vs researcher tilt from career descriptions
-    - Hireability (18%): 23 behavioral signals — open-to-work, response rate,
-      interview completion, offer acceptance, notice period
-    - Trap Penalty (90% reduction): 6-flag detector for honeypots and keyword stuffers
-  This dual-axis approach (Fit × Hireability) is the core novelty: a perfect-on-paper
-  candidate who is inactive and unresponsive ranks lower than a slightly weaker but
-  genuinely available candidate. Runtime ~90 seconds on 8-core CPU.
+  HireabilityRank introduces dual-axis candidate scoring: Skill Fit × Hireability.
+  Most rankers only score on skill match; a technically perfect candidate who hasn't
+  logged in for 3 months and has a 0% recruiter response rate is not actually
+  hirable. Our system scores both dimensions separately and multiplies them.
 
+  Pipeline: (1) Offline precompute.py encodes all 100K candidates with
+  all-MiniLM-L6-v2 and builds a FAISS IndexFlatIP. (2) Runtime rank.py embeds
+  the JD, retrieves top 5000 via FAISS cosine search, then reranks with five
+  weighted components: semantic match (28%), skill overlap with trust multiplier
+  (25%), years-of-experience fit (12%), product-vs-research career tilt (12%),
+  and hireability score from 23 behavioral signals (18%). A 6-flag trap detector
+  applies a 90% score penalty to honeypots and keyword stuffers.
+  Runtime: under 2 minutes on 8-core CPU after precompute.
+
+# ============================================================================
+# Declarations
+# ============================================================================
 declarations:
   read_submission_spec: true
   code_is_original_work: true
