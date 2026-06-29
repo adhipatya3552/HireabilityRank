@@ -17,3 +17,4 @@ dataset folder/
 *.pptx
 *.pdf
 make_deck.js
+*.xlsx
