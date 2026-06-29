@@ -19,7 +19,7 @@ team_members:
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/adhipatya3552/HireabilityRank.git"
+github_repo: "https://github.com/adhipatya3552/HireabilityRank"
 # ↑ Create this repo and push the code before submitting
 
 sandbox_link: "https://huggingface.co/spaces/adhipatya3552/hireabilityrank"
