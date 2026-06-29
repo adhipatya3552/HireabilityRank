@@ -1,3 +1,14 @@
+---
+title: HireabilityRant
+emoji: 🎯
+colorFrom: purple
+colorTo: indigo
+sdk: gradio
+sdk_version: 4.44.0
+app_file: app.py
+pinned: false
+---
+
 # HireabilityRank 🎯
 **AI Candidate Ranker with Dual-Axis Scoring: Skill Fit × Hireability**
 
