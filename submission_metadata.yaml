@@ -22,7 +22,7 @@ team_members:
 github_repo: "https://github.com/adhipatya3552/HireabilityRank"
 # ↑ Create this repo and push the code before submitting
 
-sandbox_link: "https://huggingface.co/spaces/adhipatya3552/hireabilityrank"
+sandbox_link: "https://huggingface.co/spaces/adhipatya03/HireabilityRank"
 # ↑ Deploy app.py to HuggingFace Spaces (free CPU tier) before submitting
 
 reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
